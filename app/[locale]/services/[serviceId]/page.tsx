@@ -5,7 +5,7 @@ import { Metadata } from 'next/types';
 export default async function servicePage({
   params,
 }: {
-  params: { serviceId: string };
+  params: Promise<{ serviceId: string }>;
 }) {
   const { serviceId } = await params;
   const service = getServiceById(serviceId);
