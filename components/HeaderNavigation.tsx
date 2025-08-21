@@ -12,16 +12,10 @@ const HeaderNavigation = () => {
   const locale = useLocale();
   const t = useTranslations();
 
-  const searchRef = useRef<HTMLInputElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
 
   // Scroll state for navbar background change
   const [isScrolled, setIsScrolled] = useState(false);
-
-  // Logo state from API
-  const [logoUrl] = useState<string>('/logo.svg');
-
-  const [services] = useState<any[]>([]);
 
   const isRTL = locale === 'ar';
 
@@ -34,23 +28,6 @@ const HeaderNavigation = () => {
     { name: t('nav.contact'), href: `/${locale}/contact-us` },
   ];
 
-  // Handle scroll events to change navbar background
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 10);
-    };
-
-    // Add event listener
-    window.addEventListener('scroll', handleScroll);
-
-    // Check initial scroll position
-    handleScroll();
-
-    // Cleanup event listener
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const handleLanguageSwitch = () => {
     const newLocale = locale === 'en' ? 'ar' : 'en';
     const currentPath = pathname.replace(`/${locale}`, '');
@@ -59,9 +36,9 @@ const HeaderNavigation = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isRTL ? 'rtl' : 'ltr'
-      } ${isScrolled ? 'shadow-lg' : ''}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300  ${
+        isScrolled ? 'shadow-lg' : ''
+      }`}
       style={{
         backgroundColor: isScrolled ? '#4B2615' : 'transparent',
         background: isScrolled ? '#4B2615' : 'none',
@@ -77,7 +54,7 @@ const HeaderNavigation = () => {
             <Link href={`/${locale}`} className="flex items-center">
               {
                 <Image
-                  src={logoUrl}
+                  src={'/logo.svg'}
                   alt="BinHindi Law Logo"
                   width={320}
                   height={80}
@@ -100,9 +77,7 @@ const HeaderNavigation = () => {
                   >
                     {item.name}
                     <svg
-                      className={`ml-2 h-4 w-4 transition-transform duration-200   ${
-                        isRTL ? 'rotate-180 mr-2 ml-0' : ''
-                      }`}
+                      className={`ml-2 h-4 w-4 transition-transform duration-200  `}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
