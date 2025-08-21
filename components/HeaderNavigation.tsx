@@ -1,32 +1,39 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
+import * as React from 'react';
 
-const HeaderNavigation = () => {
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { API } from '@strapi/client';
+
+interface HeaderNavigationProps {
+  services: Promise<API.DocumentResponseCollection<API.Document>>;
+}
+
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ services }) => {
+  const servicesPromise = React.use(services);
+  const servicesData = servicesPromise.data || [];
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations();
 
-  const servicesRef = useRef<HTMLDivElement>(null);
+  const serviceItems = servicesData.map((service) => ({
+    title: service.title,
 
-  // Scroll state for navbar background change
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const isRTL = locale === 'ar';
-
-  const navigationItems = [
-    { name: t('nav.home'), href: `/${locale}` },
-    { name: t('nav.about'), href: `/${locale}/about-us` },
-    { name: t('nav.services'), href: '#', isDropdown: true },
-    { name: t('nav.blog'), href: `/${locale}/blogs` },
-    { name: t('nav.team'), href: `/${locale}/our-team` },
-    { name: t('nav.contact'), href: `/${locale}/contact-us` },
-  ];
+    href: `/${locale}/services/${service.documentId}`,
+  }));
 
   const handleLanguageSwitch = () => {
     const newLocale = locale === 'en' ? 'ar' : 'en';
@@ -36,18 +43,9 @@ const HeaderNavigation = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300  ${
-        isScrolled ? 'shadow-lg' : ''
-      }`}
-      style={{
-        backgroundColor: isScrolled ? '#4B2615' : 'transparent',
-        background: isScrolled ? '#4B2615' : 'none',
-      }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300`}
     >
-      <nav
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        style={{ background: 'none', backgroundColor: 'transparent' }}
-      >
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -66,41 +64,69 @@ const HeaderNavigation = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-            {navigationItems.map((item) =>
-              item.isDropdown ? (
-                /* Services Dropdown */
-                <div key="services" className="relative" ref={servicesRef}>
-                  <button
-                    className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center"
-                    aria-haspopup="true"
+          <div className="hidden md:flex items-center">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}
                   >
-                    {item.name}
-                    <svg
-                      className={`ml-2 h-4 w-4 transition-transform duration-200  `}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                >
-                  {item.name}
-                </Link>
-              ),
-            )}
+                    <Link href={`/${locale}`}>{t('nav.home')}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <Link href={`/${locale}/about-us`}>{t('nav.about')}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    {t('nav.services')}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {serviceItems.map((service) => (
+                        <ListItem
+                          key={service.title}
+                          title={service.title}
+                          href={service.href}
+                        ></ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <Link href={`/${locale}/blogs`}>{t('nav.blog')}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <Link href={`/${locale}/our-team`}>{t('nav.team')}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <Link href={`/${locale}/contact-us`}>
+                      {t('nav.contact')}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* Right side controls */}
@@ -132,11 +158,7 @@ const HeaderNavigation = () => {
             {/* Language Toggle */}
             <button
               onClick={handleLanguageSwitch}
-              className={`${
-                isScrolled
-                  ? 'bg-brown-800 hover:bg-brown-700'
-                  : 'bg-white/10 backdrop-blur-sm hover:bg-white/20'
-              } text-white px-3 py-1 rounded-md text-sm font-medium transition-all duration-200`}
+              className={`${'bg-white/10 backdrop-blur-sm hover:bg-white/20'} text-white px-3 py-1 rounded-md text-sm font-medium transition-all duration-200`}
               aria-label={t('language.toggle')}
             >
               {locale === 'en' ? 'العربية' : 'English'}
@@ -160,5 +182,29 @@ const HeaderNavigation = () => {
     </header>
   );
 };
+
+// Helper component for navigation menu items
+function ListItem({
+  title,
+  children,
+  href,
+  ...props
+}: React.ComponentPropsWithoutRef<'li'> & { href: string }) {
+  return (
+    <li {...props}>
+      <NavigationMenuLink asChild>
+        <Link
+          href={href}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors bg-transparent"
+        >
+          <div className="text-base font-medium leading-none">{title}</div>
+          <p className="text-white line-clamp-2 text-sm leading-snug">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  );
+}
 
 export default HeaderNavigation;

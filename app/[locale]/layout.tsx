@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import HeaderNavigation from '@/components/HeaderNavigation';
 import Footer from '@/components/Footer';
 import '../globals.css';
+import { getServices } from '@/actions';
 
 const font = DM_Sans({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -44,6 +45,7 @@ export default async function RootLayout({
   // Load messages for the current locale
   const messages = await getMessages(locale);
 
+  const services = getServices();
   return (
     <html
       lang={locale}
@@ -68,7 +70,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <HeaderNavigation />
+          <HeaderNavigation services={services} />
           <main>{children}</main>
           <Footer />
         </NextIntlClientProvider>

@@ -1,3 +1,4 @@
+import { getServices } from '@/actions';
 import HomePage from '@/modules/home/views/HomePage';
 
 export const metadata = {
