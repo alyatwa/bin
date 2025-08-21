@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -14,7 +14,7 @@ interface SearchResult {
 
 interface SearchPageProps {}
 
-const SearchPage: React.FC<SearchPageProps> = () => {
+const SearchPageContent: React.FC<SearchPageProps> = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -24,9 +24,11 @@ const SearchPage: React.FC<SearchPageProps> = () => {
   const isRTL = locale === 'ar';
 
   // Mock search function - replace with actual search implementation
-  const handlePerformSearch = async (searchQuery: string): Promise<SearchResult[]> => {
+  const handlePerformSearch = async (
+    searchQuery: string,
+  ): Promise<SearchResult[]> => {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Mock data - replace with actual search API call
     const mockResults: SearchResult[] = [
@@ -35,42 +37,43 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         title: 'Ahmed Al-Rashid',
         description: 'Senior Partner specializing in Corporate Law',
         type: 'team',
-        href: `/${locale}/our-team/ahmed-al-rashid`
+        href: `/${locale}/our-team/ahmed-al-rashid`,
       },
       {
         id: '2',
         title: t('services.legal_consultation'),
         description: 'Professional legal advice and consultation services',
         type: 'service',
-        href: `/${locale}/services/legal-consultation`
+        href: `/${locale}/services/legal-consultation`,
       },
       {
         id: '3',
         title: 'Sarah Johnson',
         description: 'Associate specializing in Contract Law',
         type: 'team',
-        href: `/${locale}/our-team/sarah-johnson`
+        href: `/${locale}/our-team/sarah-johnson`,
       },
       {
         id: '4',
         title: t('services.contract_drafting'),
         description: 'Professional contract drafting and review services',
         type: 'service',
-        href: `/${locale}/services/contract-drafting`
+        href: `/${locale}/services/contract-drafting`,
       },
       {
         id: '5',
         title: 'Mohammed bin Hindi',
         description: 'Founding Partner and Senior Advocate',
         type: 'team',
-        href: `/${locale}/our-team/mohammed-bin-hindi`
+        href: `/${locale}/our-team/mohammed-bin-hindi`,
       },
     ];
 
     // Filter results based on search query
-    return mockResults.filter(result =>
-      result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return mockResults.filter(
+      (result) =>
+        result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        result.description.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
@@ -96,13 +99,12 @@ const SearchPage: React.FC<SearchPageProps> = () => {
     searchData();
   }, [query, t, locale]);
 
-  const teamResults = results.filter(result => result.type === 'team');
-  const serviceResults = results.filter(result => result.type === 'service');
+  const teamResults = results.filter((result) => result.type === 'team');
+  const serviceResults = results.filter((result) => result.type === 'service');
 
   return (
     <div className={`min-h-screen bg-amber-50 py-8 ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Search Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-amber-900 mb-4">
@@ -110,10 +112,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
           </h1>
           {query && (
             <p className="text-amber-700 text-lg">
-              {isRTL 
+              {isRTL
                 ? `نتائج البحث عن: "${query}"`
-                : `Search results for: "${query}"`
-              }
+                : `Search results for: "${query}"`}
             </p>
           )}
         </div>
@@ -132,10 +133,9 @@ const SearchPage: React.FC<SearchPageProps> = () => {
               {t('search.no_results')}
             </div>
             <p className="text-amber-500">
-              {isRTL 
+              {isRTL
                 ? 'حاول استخدام كلمات مختلفة أو أكثر عمومية'
-                : 'Try using different or more general keywords'
-              }
+                : 'Try using different or more general keywords'}
             </p>
           </div>
         )}
@@ -143,7 +143,6 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         {/* Results */}
         {!isLoading && results.length > 0 && (
           <div className="space-y-8">
-            
             {/* Team Results */}
             {teamResults.length > 0 && (
               <section>
@@ -158,14 +157,14 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                       className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border-l-4 border-amber-500"
                       tabIndex={0}
                       role="link"
-                      aria-label={`${isRTL ? 'عرض ملف' : 'View profile of'} ${result.title}`}
+                      aria-label={`${isRTL ? 'عرض ملف' : 'View profile of'} ${
+                        result.title
+                      }`}
                     >
                       <h3 className="text-xl font-semibold text-amber-900 mb-2">
                         {result.title}
                       </h3>
-                      <p className="text-amber-700">
-                        {result.description}
-                      </p>
+                      <p className="text-amber-700">{result.description}</p>
                       <div className="mt-3 text-amber-600 text-sm font-medium">
                         {isRTL ? 'عضو الفريق' : 'Team Member'}
                       </div>
@@ -189,14 +188,14 @@ const SearchPage: React.FC<SearchPageProps> = () => {
                       className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border-l-4 border-amber-600"
                       tabIndex={0}
                       role="link"
-                      aria-label={`${isRTL ? 'عرض خدمة' : 'View service'} ${result.title}`}
+                      aria-label={`${isRTL ? 'عرض خدمة' : 'View service'} ${
+                        result.title
+                      }`}
                     >
                       <h3 className="text-xl font-semibold text-amber-900 mb-2">
                         {result.title}
                       </h3>
-                      <p className="text-amber-700">
-                        {result.description}
-                      </p>
+                      <p className="text-amber-700">{result.description}</p>
                       <div className="mt-3 text-amber-600 text-sm font-medium">
                         {isRTL ? 'خدمة قانونية' : 'Legal Service'}
                       </div>
@@ -212,16 +211,14 @@ const SearchPage: React.FC<SearchPageProps> = () => {
         {!query && !isLoading && (
           <div className="text-center py-12">
             <div className="text-amber-600 text-xl mb-4">
-              {isRTL 
+              {isRTL
                 ? 'ابدأ البحث للعثور على فريقنا وخدماتنا'
-                : 'Start searching to find our team and services'
-              }
+                : 'Start searching to find our team and services'}
             </div>
             <p className="text-amber-500">
-              {isRTL 
+              {isRTL
                 ? 'استخدم شريط البحث في الأعلى للبدء'
-                : 'Use the search bar above to get started'
-              }
+                : 'Use the search bar above to get started'}
             </p>
           </div>
         )}
@@ -229,5 +226,17 @@ const SearchPage: React.FC<SearchPageProps> = () => {
     </div>
   );
 };
+
+const SearchPage: React.FC<SearchPageProps> = () => (
+  <Suspense
+    fallback={
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-900"></div>
+      </div>
+    }
+  >
+    <SearchPageContent />
+  </Suspense>
+);
 
 export default SearchPage;
